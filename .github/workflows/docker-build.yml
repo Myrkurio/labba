@@ -28,7 +28,7 @@ jobs:
       - name: Test endpoint
         run: |
           response=$(curl -s http://localhost:5000)
-          if [[ "$response" != *"Hello, DevOps!"* ]]; then
+          if [[ "$response" != *"Работа Парбузина Сергея, ЦТС-32"* ]]; then
             echo "Test failed: unexpected response"
             exit 1
           fi
