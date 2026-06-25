@@ -1,0 +1,40 @@
+name: CI - Build and Test Docker Image
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t lab-app-ci .
+
+      - name: Run container
+        run: |
+          docker run -d -p 5000:5000 --name test-lab lab-app-ci
+          sleep 5
+
+      - name: Test endpoint
+        run: |
+          response=$(curl -s http://localhost:5000)
+          if [[ "$response" != *"Hello, DevOps!"* ]]; then
+            echo "Test failed: unexpected response"
+            exit 1
+          fi
+          echo "Test passed!"
+
+      - name: Cleanup
+        run: |
+          docker stop test-lab || true
+          docker rm test-lab || true
